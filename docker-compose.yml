@@ -1,47 +1,47 @@
 version: "3.1"
+#Indicamos la version de docker compose que utilizamos
+#Y luego los servicios que vamos a implementar
 services:
-    mysql_db:
+    servidorsql:
         image: mysql:latest
-        container_name: DB_MYSQL
+        container_name: sql
+        ports:
+            - 3307:3307
         command: --default-authentication-plugin=mysql_native_password
-        restart: always
-        ports: 
-            - "3306:3306"
         environment:
-            MYSQL_DATABASE: Occidental_Escuinapa
-            MYSQL_PASSWORD: 12345
-            MYSQL_ROOT_PASSWORD: 12345 
+            #Base de datos que utilizaremos.
+            MYSQ_DATABASE: tutorias
+            #Contraseña para root.
+            MYSQL_ROOT_PASSWORD: 1234
         volumes:
-            - ./dump:/docker-entrypoint-initdb.d
+            - ./base_datos:/docker-entrypoint-initdb.d
             - ./conf:/etc/mysql/conf.d
             - persistent:/var/lib/mysql
         networks:
             - default
-    pagina:
-        image: php:8.0.0-apache
+    php:
         build:
-          context: ./Dockerfile
-          dockerfile: apache_file
-        ports: 
-            - "80:80"
+        ports:
+            - 9090:80
         volumes:
-            - ./www:/var/www/html
+            #Indicamos con quien va relacionado
+            - ./pagina:/var/www/html
         links:
-            - db
+            #Indicamos con quien va relacionado
+            - servidorsql
         networks:
             - default
-        container_name: ServidorPHP
+        container_name: hostingphp
     phpmyadmin:
-        image: phpmyadmin/phpmyadmin
-        container_name: Admin
+        image: phpmyadmin:latest
+        container_name: phpmyadmin
         links: 
-            - db:db
+            #Indicamos con quien va relacionado
+            - servidorsql:db
         ports:
-            - 8000:80
+            - 8080:80
         environment:
             MYSQL_USER: root
-            MYSQL_PASSWORD: 12345
-            MYSQL_ROOT_PASSWORD: 12345
-          - PMA_ARBITRARY=1            
+            MYSQL_ROOT_PASSWORD: 1234
 volumes:
     persistent:
