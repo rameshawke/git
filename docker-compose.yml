@@ -21,10 +21,6 @@ services:
             - default
     php:
         build:
-            #Indicamos la carpeta dodne guardamos el Docker File
-            context: ./Dockerfile
-            #Indicamos el archivo dockerfile de este contenedor
-            dockerfile: apache_file
         ports:
             - 9090:80
         volumes:
